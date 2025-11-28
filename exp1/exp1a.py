@@ -3,6 +3,7 @@
 class CaesarCipher:
     def encrypt(self, message, key):
         result = ""
+        key = key % 26   # NEW: supports negative keys
 
         for char in message:
             if char.isalpha():
@@ -16,6 +17,7 @@ class CaesarCipher:
     
     def decrypt(self, message, key):
         result = ""
+        key = key % 26   # NEW: supports negative keys
 
         for char in message:
             if char.isalpha():
@@ -27,6 +29,10 @@ class CaesarCipher:
         
         return result
 
+    def bruteforce(self, message):  # NEW FEATURE 2
+        for k in range(26):
+            print(f"Key {k}: {self.decrypt(message, k)}")
+
 if __name__ == "__main__":
     caesar_cipher = CaesarCipher()
     message = str(input("Enter a message: "))
@@ -37,3 +43,6 @@ if __name__ == "__main__":
 
     plain_text = caesar_cipher.decrypt(cipher_text, key)
     print("Decrypted Message: ", plain_text)
+
+    print("\nBruteforce Results:")
+    caesar_cipher.bruteforce(cipher_text)

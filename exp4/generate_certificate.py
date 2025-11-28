@@ -12,7 +12,11 @@ common_name = input("Common Name (e.g., localhost): ")
 # Absolute paths
 BASE_DIR = "/home/raghu/Documents/NSELab/exp4"
 PRIVATE_KEY_FILE = os.path.join(BASE_DIR, "private.key")
+CSR_FILE = os.path.join(BASE_DIR, "request.csr")   # NEW FEATURE 2
 CERT_FILE = os.path.join(BASE_DIR, "certificate.crt")
+
+# NEW FEATURE 1: Create directory if missing
+os.makedirs(BASE_DIR, exist_ok=True)
 
 def run_command(command, input_text=None):
     """Run a shell command and return its output."""
@@ -33,9 +37,13 @@ def run_command(command, input_text=None):
 print("Generating private key...")
 run_command(f"openssl genpkey -algorithm RSA -out \"{PRIVATE_KEY_FILE}\" -pkeyopt rsa_keygen_bits:2048")
 
-# 2. Generate self-signed certificate (valid for 365 days)
-print("Generating self-signed certificate...")
+# 2. Create CSR (Certificate Signing Request) – NEW FEATURE 2
+print("Generating CSR...")
 subject = f"/C={country}/ST={state}/L={locality}/O={organization}/OU={org_unit}/CN={common_name}"
-run_command(f"openssl req -new -x509 -key \"{PRIVATE_KEY_FILE}\" -out \"{CERT_FILE}\" -days 365 -subj \"{subject}\"")
+run_command(f"openssl req -new -key \"{PRIVATE_KEY_FILE}\" -out \"{CSR_FILE}\" -subj \"{subject}\"")
 
-print("Certificate generated successfully.")
+# 3. Generate self-signed certificate (valid 365 days)
+print("Generating self-signed certificate...")
+run_command(f"openssl req -x509 -key \"{PRIVATE_KEY_FILE}\" -in \"{CSR_FILE}\" -out \"{CERT_FILE}\" -days 365")
+
+print("Certificate and CSR generated successfully.")
